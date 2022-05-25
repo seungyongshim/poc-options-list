@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2022-05-25_04-29-38" tag="3_2382140357">
+  <assembly name="Sample">
+    <class name="Sample.Prelude" coveredlines="0" coverablelines="1" totallines="7" coveredbranches="0" totalbranches="2" coveredcodeelements="0" totalcodeelements="1" />
+  </assembly>
+</coverage>
