@@ -9,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Toolkit.HighPerformance;
 using Xunit;
-using static Sample.Prelude;
 
 namespace Sample.Tests;
 
@@ -19,26 +18,31 @@ public class Business
     public IList<string> SnsArn { get; set; }
 }
 
-public class PreludeSpec
+public class BusinnessClassOptionSpec
 {
     [Fact]
     public async Task OptionsSpec()
     {
-        using var appsettingsStream = Encoding.Default.GetBytes(@"
+        using var appsettingsStream = Encoding.Default.GetBytes("""
         {
-            'Business' : {
-                'S3Arn' : 's3arn',
-                'SnsArn' : ['snsarn1', 'snsarn2'],
-                'Region' : 'ap-northeast-1'
+            "Business" : {
+                "S3Arn" : "s3arn",
+                "SnsArn" : ["snsarn1", "snsarn2"],
+                "Region" : "ap-northeast-1"
             }
-        }".Replace('\'', '\"')).AsMemory().AsStream();
+        }
+        """).AsMemory().AsStream();
 
         var host = Host.CreateDefaultBuilder()
                        .ConfigureAppConfiguration(config => config.AddJsonStream(appsettingsStream))
                        .ConfigureServices(services =>
                        {
                            services.AddOptions<Business>()
-                                   .BindConfiguration("Business");
+                                   .BindConfiguration("Business")
+                                   .PostConfigure(o =>
+                                   {
+                                       o.S3Arn = "Hello";
+                                   });
                        })
                        .Build();
 
@@ -46,7 +50,8 @@ public class PreludeSpec
 
         var ret = host.Services.GetService<IOptions<Business>>();
 
-        Assert.Equal(2, ret.Value.SnsArn.Count());
+        Assert.Equal(2, ret.Value.SnsArn.Count);
+        Assert.Equal("Hello", ret.Value.S3Arn);
 
         await host.StopAsync();
 
